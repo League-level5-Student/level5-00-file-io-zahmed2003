@@ -2,6 +2,9 @@ package _03_To_Do_List;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -119,9 +122,40 @@ public class ToDoList implements ActionListener{
 		{
 			try {
 				FileWriter fw = new FileWriter("src/_03_To_Do_List/list.txt");
+				for(String s: tasks)
+				{
+					fw.write("\n" + s);
+				}
+				
+				fw.close();
+				
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
+			}
+		}
+		
+		if(e.getSource().equals(load))
+		{
+			JFileChooser jfc = new JFileChooser();
+			int ret = jfc.showOpenDialog(null);
+			if(ret == JFileChooser.APPROVE_OPTION)
+			{
+				try {
+					BufferedReader br = new BufferedReader(new FileReader(jfc.getSelectedFile().getAbsolutePath()));
+					String currentLine = br.readLine();
+					
+					tasks.add(currentLine);
+					
+					while(currentLine != null)
+					{
+						tasks.add(currentLine);
+						currentLine = br.readLine();
+					}
+				}
+				catch (Exception e1) {
+						e1.printStackTrace();
+					}
+				
 			}
 		}
 		
