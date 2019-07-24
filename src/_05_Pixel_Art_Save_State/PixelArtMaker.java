@@ -23,46 +23,55 @@ public class PixelArtMaker implements MouseListener{
 	ColorSelectionPanel csp;
 	private static final String DATA_FILE = "src/_05_Pixel_Art_Save_State/saved.dat";
 	
-	private void save(JFrame data) {
+	private void save(GridPanel gip2) {
 		try (FileOutputStream fos = new FileOutputStream(new File(DATA_FILE)); ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-			oos.writeObject(data);
+			oos.writeObject(gip2);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
 	public void start() {
-		gip = new GridInputPanel(this);	
+		
 		sb = new JButton("Save");
+		gip = new GridInputPanel(this);
 		window = new JFrame("Pixel Art");
 		window.setLayout(new FlowLayout());
 		window.setResizable(false);
 		
-		window.add(gip);
-		window.add(sb);
-		sb.addActionListener(e -> {
-			save(window);
-			
-		}); 
-		window.pack();
-		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
 		try (FileInputStream fis = new FileInputStream(new File(DATA_FILE)); ObjectInputStream ois = new ObjectInputStream(fis)) {
-			window = (JFrame) ois.readObject();
-		} catch (Exception e) {
+			gp = (GridPanel) ois.readObject();
+			csp = new ColorSelectionPanel();
+			window.add(gp);
+			window.add(csp);
+			window.add(sb);
+			gp.repaint();
+			gp.addMouseListener(this);
+		} 
+		catch (Exception e) {
 			e.printStackTrace();
+			window.add(gip);
 		}
 		
+		sb.addActionListener(exp -> {
+			save(gp);
+		}); 
 		
+		window.pack();
+		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setVisible(true);
 	}
 
 	public void submitGridData(int w, int h, int r, int c) {
+		
 		gp = new GridPanel(w, h, r, c);
 		csp = new ColorSelectionPanel();
+		
 		window.remove(gip);
 		window.add(gp);
 		window.add(csp);
+		window.add(sb);
+		
 		gp.repaint();
 		gp.addMouseListener(this);
 		window.pack();
@@ -79,7 +88,7 @@ public class PixelArtMaker implements MouseListener{
 	@Override
 	public void mousePressed(MouseEvent e) {
 		gp.setColor(csp.getSelectedColor());
-		System.out.println(csp.getSelectedColor());
+		//System.out.println(csp.getSelectedColor());
 		gp.clickPixel(e.getX(), e.getY());
 		gp.repaint();
 	}
